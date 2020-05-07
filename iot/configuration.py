@@ -38,12 +38,16 @@ class PConf:
         mqtt_level = "info"
 
     @simple_env_var.section
-    class Client:
+    class MQTTClient:
         clean_session = False
         event_topic = "event/#"
         command_topic = "command"
-        response_topic = "response"
+        response_topic = "response/#"
         keep_alive = 10
+
+    @simple_env_var.section
+    class DSRouter:
+        max_command_age = 60
 
 
 config = PConf()
