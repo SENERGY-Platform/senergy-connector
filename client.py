@@ -18,8 +18,11 @@
 from iot.device_manager import DeviceManager
 from iot.monitor import Monitor
 from iot.mqtt import Client
+from iot import upstream
+from iot import downstream
 import time
 import cc_lib
+import queue
 
 
 device_manager = DeviceManager()
@@ -37,6 +40,13 @@ connector_client.setConnectClbk(on_connect)
 
 monitor = Monitor(device_manager, connector_client)
 
+upstream_queue = queue.Queue()
+
+mqtt_client = Client(upstream_queue)
+
+upstream_router = upstream.Router(connector_client, upstream_queue)
+downstream_router = downstream.Router(connector_client, mqtt_client)
+
 
 if __name__ == '__main__':
     while True:
@@ -47,5 +57,8 @@ if __name__ == '__main__':
             time.sleep(10)
     connector_client.connect(reconnect=True)
     monitor.start()
+    upstream_router.start()
+    downstream_router.start()
+    mqtt_client.start()
     monitor.join()
 
