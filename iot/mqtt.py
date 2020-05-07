@@ -31,11 +31,12 @@ mqtt_logger.setLevel(logging_levels.setdefault(config.Logger.mqtt_level, "info")
 
 
 class Client(threading.Thread):
-    def __init__(self):
+    def __init__(self, upstream_queue):
         super().__init__(name="mqtt", daemon=True)
+        self.__upstream_queue = upstream_queue
         self.__mqtt = paho.mqtt.client.Client(
             client_id=EnvVars.ModuleID.value,
-            clean_session=config.Client.clean_session
+            clean_session=config.MQTTClient.clean_session
         )
         self.__mqtt.on_connect = self.__onConnect
         self.__mqtt.on_disconnect = self.__onDisconnect
@@ -46,7 +47,7 @@ class Client(threading.Thread):
     def run(self) -> None:
         while True:
             try:
-                self.__mqtt.connect(config.MB.host, config.MB.port, keepalive=config.Client.keep_alive)
+                self.__mqtt.connect(config.MB.host, config.MB.port, keepalive=config.MQTTClient.keep_alive)
             except Exception as ex:
                 logger.error(
                     "could not connect to '{}' on '{}' - {}".format(config.MB.host, config.MB.port, ex)
@@ -60,7 +61,8 @@ class Client(threading.Thread):
         if rc == 0:
             self.__discon_count = 0
             logger.info("connected to '{}'".format(config.MB.host))
-            self.__mqtt.subscribe(config.Client.event_topic)
+            self.__mqtt.subscribe(config.MQTTClient.event_topic)
+            self.__mqtt.subscribe(config.MQTTClient.response_topic)
         else:
             logger.error("could not connect to '{}' - {}".format(config.MB.host, paho.mqtt.client.connack_string(rc)))
 
@@ -73,8 +75,10 @@ class Client(threading.Thread):
             self.__discon_count += 1
 
     def __onMessage(self, client, userdata, message: paho.mqtt.client.MQTTMessage):
-        logger.info(message.topic)
-        logger.info(message.payload)
+        try:
+            self.__upstream_queue.put_nowait((message.topic.split("/"), message.payload))
+        except Exception as ex:
+            logger.error(ex)
 
     def publish(self, topic: str, payload: str, qos: int) -> None:
         try:
