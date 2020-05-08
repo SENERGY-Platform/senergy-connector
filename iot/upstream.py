@@ -48,5 +48,6 @@ class Router(threading.Thread):
                         cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"]),
                         asynchronous=True
                     )
+                    logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
         except Exception as ex:
             logger.error(ex)
