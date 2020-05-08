@@ -28,5 +28,5 @@ logging_levels = {
 }
 
 
-root_logger = cc_lib.logger.getLogger("dyson")
+root_logger = cc_lib.logger.getLogger("iot")
 root_logger.setLevel(logging_levels.setdefault(config.Logger.level, logging.INFO))
