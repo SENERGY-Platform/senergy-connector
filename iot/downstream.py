@@ -35,15 +35,16 @@ class Router(threading.Thread):
 
     def run(self) -> None:
         try:
-            cmd = self.__cc.receiveCommand()
-            logger.debug(cmd)
-            if time.time() - cmd.timestamp <= config.DSRouter.max_command_age:
-                self.__mqtt.publish(
-                    "{}/{}/{}".format(config.MQTTClient.command_topic, cmd.device_id, cmd.service_uri),
-                    json.dumps({"command_id": cmd.correlation_id, "data": cmd.message.data}),
-                    qos=1
-                )
-            else:
-                logger.warning("dropped command - max age exceeded - correlation id: {}".format(cmd.correlation_id))
+            while True:
+                cmd = self.__cc.receiveCommand()
+                logger.debug(cmd)
+                if time.time() - cmd.timestamp <= config.DSRouter.max_command_age:
+                    self.__mqtt.publish(
+                        "{}/{}/{}".format(config.MQTTClient.command_topic, cmd.device_id, cmd.service_uri),
+                        json.dumps({"command_id": cmd.correlation_id, "data": cmd.message.data}),
+                        qos=1
+                    )
+                else:
+                    logger.warning("dropped command - max age exceeded - correlation id: {}".format(cmd.correlation_id))
         except Exception as ex:
             logger.error(ex)
