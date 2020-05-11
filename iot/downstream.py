@@ -16,7 +16,7 @@
 
 
 from .logger import root_logger
-from .configuration import config
+from .configuration import config, EnvVars
 from .mqtt import Client
 import threading
 import cc_lib
@@ -41,7 +41,7 @@ class Router(threading.Thread):
                 if time.time() - cmd.timestamp <= config.DSRouter.max_command_age:
                     self.__mqtt.publish(
                         "{}/{}/{}".format(config.MQTTClient.command_topic, cmd.device_id, cmd.service_uri),
-                        json.dumps({"command_id": cmd.correlation_id, "data": cmd.message.data}),
+                        json.dumps({"command_id": "{}-{}".format(EnvVars.ModuleID.value, cmd.correlation_id), "data": cmd.message.data}),
                         qos=1
                     )
                 else:
