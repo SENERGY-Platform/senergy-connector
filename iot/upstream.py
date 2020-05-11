@@ -15,6 +15,7 @@
 """
 
 
+from .configuration import EnvVars
 from .logger import root_logger
 import threading
 import cc_lib
@@ -45,7 +46,7 @@ class Router(threading.Thread):
                     data = json.loads(data)
                     msg.data = data["data"]
                     self.__client.sendResponse(
-                        cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"]),
+                        cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"].replace("{}-".format(EnvVars.ModuleID.value), "")),
                         asynchronous=True
                     )
                     logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
