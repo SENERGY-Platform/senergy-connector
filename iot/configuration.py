@@ -48,6 +48,7 @@ class PConf:
     @simple_env_var.section
     class DSRouter:
         max_command_age = 60
+        cmd_prefix = "client-connector"
 
 
 config = PConf()
