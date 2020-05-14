@@ -15,6 +15,7 @@
 """
 
 
+from iot.configuration import config, EnvVars
 from iot.device_manager import DeviceManager
 from iot.monitor import Monitor
 from iot.mqtt import Client
@@ -44,8 +45,10 @@ upstream_queue = queue.Queue()
 
 mqtt_client = Client(upstream_queue)
 
-upstream_router = upstream.Router(connector_client, upstream_queue)
-downstream_router = downstream.Router(connector_client, mqtt_client)
+cmd_prefix = "{}-{}-".format(EnvVars.ModuleID.value, config.DSRouter.cmd_prefix)
+
+upstream_router = upstream.Router(connector_client, upstream_queue, cmd_prefix)
+downstream_router = downstream.Router(connector_client, mqtt_client, cmd_prefix)
 
 
 if __name__ == '__main__':
