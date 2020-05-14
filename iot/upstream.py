@@ -26,10 +26,11 @@ logger = root_logger.getChild(__name__.split(".", 1)[-1])
 
 
 class Router(threading.Thread):
-    def __init__(self, client: cc_lib.client.Client, upstream_queue):
+    def __init__(self, client: cc_lib.client.Client, upstream_queue, cmd_prefix: str):
         super().__init__(name="upstream-router", daemon=True)
         self.__client = client
         self.__upstream_queue = upstream_queue
+        self.__cmd_prefix = cmd_prefix
 
     def run(self) -> None:
         try:
@@ -43,12 +44,13 @@ class Router(threading.Thread):
                         asynchronous=True
                     )
                 elif topic[0] == "response":
-                    data = json.loads(data)
-                    msg.data = data["data"]
-                    self.__client.sendResponse(
-                        cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"].replace("{}-".format(EnvVars.ModuleID.value), "")),
-                        asynchronous=True
-                    )
-                    logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
+                    if self.__cmd_prefix in data["command_id"]:
+                        data = json.loads(data)
+                        msg.data = data["data"]
+                        self.__client.sendResponse(
+                            cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"].replace(self.__cmd_prefix, "")),
+                            asynchronous=True
+                        )
+                        logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
         except Exception as ex:
             logger.error(ex)
