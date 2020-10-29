@@ -44,8 +44,8 @@ class Router(threading.Thread):
                         asynchronous=True
                     )
                 elif topic[0] == "response":
+                    data = json.loads(data)
                     if self.__cmd_prefix in data["command_id"]:
-                        data = json.loads(data)
                         msg.data = data["data"]
                         self.__client.sendResponse(
                             cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"].replace(self.__cmd_prefix, "")),
