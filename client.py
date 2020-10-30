@@ -21,6 +21,7 @@ from iot.monitor import Monitor
 from iot.mqtt import Client
 from iot import upstream
 from iot import downstream
+from iot import fog_downstream
 import time
 import cc_lib
 import queue
@@ -49,6 +50,7 @@ cmd_prefix = "{}-{}-".format(EnvVars.ModuleID.value, config.DSRouter.cmd_prefix)
 
 upstream_router = upstream.Router(connector_client, upstream_queue, cmd_prefix)
 downstream_router = downstream.Router(connector_client, mqtt_client, cmd_prefix)
+fog_downstream_router = fog_downstream.Router(connector_client, mqtt_client)
 
 
 if __name__ == '__main__':
@@ -62,6 +64,7 @@ if __name__ == '__main__':
     monitor.start()
     upstream_router.start()
     downstream_router.start()
+    fog_downstream_router.start()
     mqtt_client.start()
     monitor.join()
 

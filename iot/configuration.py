@@ -43,6 +43,7 @@ class PConf:
         event_topic = "event/#"
         command_topic = "command"
         response_topic = "response/#"
+        fog_topic = "fog/analytics/#"
         keep_alive = 10
 
     @simple_env_var.section

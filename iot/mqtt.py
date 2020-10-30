@@ -63,6 +63,7 @@ class Client(threading.Thread):
             logger.info("connected to '{}'".format(config.MB.host))
             self.__mqtt.subscribe(config.MQTTClient.event_topic)
             self.__mqtt.subscribe(config.MQTTClient.response_topic)
+            self.__mqtt.subscribe(config.MQTTClient.fog_topic)
         else:
             logger.error("could not connect to '{}' - {}".format(config.MB.host, paho.mqtt.client.connack_string(rc)))
 
@@ -91,3 +92,6 @@ class Client(threading.Thread):
                 logger.error(paho.mqtt.client.error_string(msg_info.rc).replace(".", "").lower())
         except (ValueError, OSError) as ex:
             logger.error(ex)
+
+    def subscribe(self, topic: str, qos: int) -> None:
+        self.__mqtt.subscribe(topic, qos)

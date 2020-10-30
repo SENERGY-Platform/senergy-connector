@@ -14,13 +14,12 @@
    limitations under the License.
 """
 
-
-from .configuration import EnvVars
-from .logger import root_logger
-import threading
-import cc_lib
 import json
+import threading
 
+import cc_lib
+
+from .logger import root_logger
 
 logger = root_logger.getChild(__name__.split(".", 1)[-1])
 
@@ -52,5 +51,11 @@ class Router(threading.Thread):
                             asynchronous=True
                         )
                         logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
+                elif topic[0] == "fog":
+                    self.__client.emmitFogMessage(
+                        topic[2],
+                        data.decode(),
+                        asynchronous=True
+                    )
         except Exception as ex:
             logger.error(ex)
