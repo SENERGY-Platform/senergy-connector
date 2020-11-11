@@ -67,17 +67,14 @@ class Monitor(Thread):
                 logger.info("can't find '{}' with id '{}'".format(
                     self.__device_manager.get(device_id).name, device_id)
                 )
-                futures.append((device_id, self.__client.deleteDevice(device_id, asynchronous=True)))
+                futures.append((device_id, self.__client.disconnectDevice(device_id, asynchronous=True)))
             for device_id, future in futures:
                 future.wait()
                 try:
                     future.result()
                     self.__device_manager.delete(device_id)
-                except cc_lib.client.DeviceDeleteError:
-                    try:
-                        self.__client.disconnectDevice(device_id)
-                    except (cc_lib.client.DeviceDisconnectError, cc_lib.client.NotConnectedError):
-                        pass
+                except (cc_lib.client.DeviceDisconnectError, cc_lib.client.NotConnectedError):
+                    pass
         if new_devices:
             futures = list()
             for device_id in new_devices:
