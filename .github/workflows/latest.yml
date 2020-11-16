@@ -34,4 +34,4 @@ jobs:
           push: true
           tags: |
             smartenergyplatform/senergy-connector:prod
-            ghcr.io/senergy-platform/senergy-connector:prod
+            ghcr.io/senergy-platform/senergy-connector:latest
