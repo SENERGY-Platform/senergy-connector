@@ -20,7 +20,7 @@ import os
 
 
 @simple_env_var.configuration
-class PConf:
+class Conf:
 
     @simple_env_var.section
     class MB:
@@ -52,7 +52,7 @@ class PConf:
         cmd_prefix = "client-connector"
 
 
-config = PConf()
+config = Conf()
 
 
 class EnvVars:
