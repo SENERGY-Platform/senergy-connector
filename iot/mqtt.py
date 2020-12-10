@@ -22,6 +22,7 @@ from .configuration import config, EnvVars
 import paho.mqtt.client
 import logging
 import threading
+import time
 
 
 logger = root_logger.getChild(__name__.split(".", 1)[-1])
@@ -47,14 +48,12 @@ class Client(threading.Thread):
         while True:
             try:
                 self.__mqtt.connect(config.MB.host, config.MB.port, keepalive=config.MQTTClient.keep_alive)
+                self.__mqtt.loop_forever()
             except Exception as ex:
                 logger.error(
                     "could not connect to '{}' on '{}' - {}".format(config.MB.host, config.MB.port, ex)
                 )
-            try:
-                self.__mqtt.loop_forever()
-            except Exception as ex:
-                logger.error("mqtt loop broke - {}".format(ex))
+            time.sleep(5)
 
     def __onConnect(self, client, userdata, flags, rc):
         if rc == 0:
