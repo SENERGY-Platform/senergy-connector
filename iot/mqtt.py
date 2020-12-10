@@ -42,7 +42,6 @@ class Client(threading.Thread):
         self.__mqtt.on_disconnect = self.__onDisconnect
         self.__mqtt.on_message = self.__onMessage
         self.__mqtt.enable_logger(mqtt_logger)
-        self.__discon_count = 0
 
     def run(self) -> None:
         while True:
@@ -59,7 +58,6 @@ class Client(threading.Thread):
 
     def __onConnect(self, client, userdata, flags, rc):
         if rc == 0:
-            self.__discon_count = 0
             logger.info("connected to '{}'".format(config.MB.host))
             self.__mqtt.subscribe(config.MQTTClient.event_topic)
             self.__mqtt.subscribe(config.MQTTClient.response_topic)
@@ -68,12 +66,10 @@ class Client(threading.Thread):
             logger.error("could not connect to '{}' - {}".format(config.MB.host, paho.mqtt.client.connack_string(rc)))
 
     def __onDisconnect(self, client, userdata, rc):
-        if self.__discon_count < 1:
-            if rc == 0:
-                logger.info("disconnected from '{}'".format(config.MB.host))
-            else:
-                logger.warning("disconnected from '{}' unexpectedly".format(config.MB.host))
-            self.__discon_count += 1
+        if rc == 0:
+            logger.info("disconnected from '{}'".format(config.MB.host))
+        else:
+            logger.warning("disconnected from '{}' unexpectedly".format(config.MB.host))
 
     def __onMessage(self, client, userdata, message: paho.mqtt.client.MQTTMessage):
         try:
