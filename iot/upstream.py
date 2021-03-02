@@ -36,26 +36,25 @@ class Router(threading.Thread):
             msg = cc_lib.client.message.Message(str())
             while True:
                 topic, data = self.__upstream_queue.get()
-                if topic[0] == "event":
-                    msg.data = data.decode()
-                    self.__client.emmitEvent(
-                        cc_lib.client.message.EventEnvelope(topic[1], topic[2], msg),
-                        asynchronous=True
-                    )
-                elif topic[0] == "response":
-                    data = json.loads(data)
-                    if self.__cmd_prefix in data["command_id"]:
-                        msg.data = data["data"]
-                        self.__client.sendResponse(
-                            cc_lib.client.message.CommandEnvelope(topic[1], topic[2], msg, data["command_id"].replace(self.__cmd_prefix, "")),
-                            asynchronous=True
-                        )
-                        logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
-                elif topic[0] == "fog":
-                    self.__client.emmitFogMessage(
-                        topic[2],
-                        data.decode(),
-                        asynchronous=True
-                    )
+                try:
+                    if topic[0] == "event":
+                        msg.data = data.decode()
+                        self.__client.emmitEvent(cc_lib.client.message.EventEnvelope(topic[1], topic[2], msg))
+                    elif topic[0] == "response":
+                        data = json.loads(data)
+                        if self.__cmd_prefix in data["command_id"]:
+                            msg.data = data["data"]
+                            self.__client.sendResponse(
+                                cc_lib.client.message.CommandEnvelope(
+                                    topic[1],
+                                    topic[2],
+                                    msg, data["command_id"].replace(self.__cmd_prefix, "")
+                                )
+                            )
+                            logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
+                    elif topic[0] == "fog":
+                        self.__client.emmitFogMessage(topic[2], data.decode(), asynchronous=True)
+                except Exception as ex:
+                    logger.error(ex)
         except Exception as ex:
             logger.error(ex)
