@@ -33,7 +33,7 @@ device_manager = DeviceManager()
 def on_connect(client: cc_lib.client.Client):
     devices = device_manager.devices
     for device in devices.values():
-        if device.state:
+        if device.state == "online":
             client.connectDevice(device.id)
 
 
