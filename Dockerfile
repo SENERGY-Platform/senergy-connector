@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3-slim-buster
 
 LABEL org.opencontainers.image.source https://github.com/SENERGY-Platform/senergy-connector
 
