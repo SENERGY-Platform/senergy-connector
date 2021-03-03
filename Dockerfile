@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source https://github.com/SENERGY-Platform/senerg
 
 #RUN apk --no-cache add git
 
-RUN apt-get install git
+RUN apt-get update && apt-get install -y git
 
 WORKDIR /usr/src/app
 
