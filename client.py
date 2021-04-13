@@ -14,36 +14,34 @@
    limitations under the License.
 """
 
-
-from iot.configuration import config, EnvVars
+from iot.util import config, EnvVars, init_logger, handle_sigterm, mqtt
 from iot.device_manager import DeviceManager
 from iot.monitor import Monitor
-from iot.mqtt import Client
 from iot import upstream
 from iot import downstream
-import time
 import cc_lib
+import time
 import queue
+import signal
 
 
 device_manager = DeviceManager()
 
 
 def on_connect(client: cc_lib.client.Client):
-    devices = device_manager.devices
-    for device in devices.values():
+    for device in device_manager.devices.values():
         if device.state == "online":
-            client.connectDevice(device.id)
+            client.connect_device(device.id)
 
 
 connector_client = cc_lib.client.Client()
-connector_client.setConnectClbk(on_connect)
+connector_client.set_connect_clbk(on_connect)
 
 monitor = Monitor(device_manager, connector_client)
 
 upstream_queue = queue.Queue()
 
-mqtt_client = Client(upstream_queue)
+mqtt_client = mqtt.Client(upstream_queue)
 
 cmd_prefix = "{}-{}-".format(EnvVars.ModuleID.value, config.DSRouter.cmd_prefix)
 
@@ -53,9 +51,12 @@ downstream_fog_prcs_router = downstream.fog_processes.Router(connector_client, m
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGTERM, handle_sigterm)
+    signal.signal(signal.SIGINT, handle_sigterm)
+    init_logger(config.Logger.level)
     while True:
         try:
-            connector_client.initHub()
+            connector_client.init_hub()
             break
         except cc_lib.client.HubInitializationError:
             time.sleep(10)

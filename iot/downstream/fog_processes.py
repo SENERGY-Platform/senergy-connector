@@ -17,18 +17,16 @@
 __all__ = ("Router", )
 
 
-from ..logger import root_logger
-from ..configuration import config
-from ..mqtt import Client
+from ..util import conf, get_logger, mqtt
 import threading
 import cc_lib
 
 
-logger = root_logger.getChild(__name__.split(".", 1)[-1])
+logger = get_logger(__name__.split(".", 1)[-1])
 
 
 class Router(threading.Thread):
-    def __init__(self, client: cc_lib.client.Client, mqtt_client: Client):
+    def __init__(self, client: cc_lib.client.Client, mqtt_client: mqtt.Client):
         super().__init__(name="downstream-fog-processes-router", daemon=True)
         self.__cc = client
         self.__mqtt = mqtt_client
@@ -36,11 +34,11 @@ class Router(threading.Thread):
     def run(self) -> None:
         try:
             while True:
-                evelope = self.__cc.receive_fog_processes()
-                logger.debug(evelope)
+                envelope = self.__cc.receive_fog_processes()
+                logger.debug(envelope)
                 self.__mqtt.publish(
-                    "{}/{}".format(config.MQTTClient.fog_processes_pub_topic, evelope.sub_topic),
-                    evelope.message,
+                    "{}/{}".format(conf.MQTTClient.fog_processes_pub_topic, envelope.sub_topic),
+                    envelope.message,
                     qos=1
                 )
         except Exception as ex:

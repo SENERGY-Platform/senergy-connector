@@ -14,6 +14,8 @@
    limitations under the License.
 """
 
+__all__ = ("conf", "EnvVars")
+
 
 import simple_env_var
 import os
@@ -53,7 +55,7 @@ class Conf:
         cmd_prefix = "client-connector"
 
 
-config = Conf()
+conf = Conf()
 
 
 class EnvVars:

@@ -13,3 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+
+from .device import *
+
+__all__ = (
+    device.__all__
+)

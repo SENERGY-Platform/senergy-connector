@@ -17,20 +17,18 @@
 __all__ = ("Router", )
 
 
-from ..logger import root_logger
-from ..configuration import config
-from ..mqtt import Client
+from ..util import conf, get_logger, mqtt
 import threading
 import cc_lib
 import json
 import time
 
 
-logger = root_logger.getChild(__name__.split(".", 1)[-1])
+logger = get_logger(__name__.split(".", 1)[-1])
 
 
 class Router(threading.Thread):
-    def __init__(self, client: cc_lib.client.Client, mqtt_client: Client, cmd_prefix: str):
+    def __init__(self, client: cc_lib.client.Client, mqtt_client: mqtt.Client, cmd_prefix: str):
         super().__init__(name="downstream-command-router", daemon=True)
         self.__cc = client
         self.__mqtt = mqtt_client
@@ -41,9 +39,9 @@ class Router(threading.Thread):
             while True:
                 cmd = self.__cc.receive_command()
                 logger.debug(cmd)
-                if time.time() - cmd.timestamp <= config.DSRouter.max_command_age:
+                if time.time() - cmd.timestamp <= conf.DSRouter.max_command_age:
                     self.__mqtt.publish(
-                        "{}/{}/{}".format(config.MQTTClient.command_pub_topic, cmd.device_id, cmd.service_uri),
+                        "{}/{}/{}".format(conf.MQTTClient.command_pub_topic, cmd.device_id, cmd.service_uri),
                         json.dumps({"command_id": "{}{}".format(self.__cmd_prefix, cmd.correlation_id), "data": cmd.message.data}),
                         qos=1
                     )

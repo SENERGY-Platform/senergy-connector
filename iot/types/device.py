@@ -21,11 +21,8 @@ import cc_lib
 
 
 class Device(cc_lib.types.Device):
-
     def __init__(self, id: str, name: str, type: str, state: str, mod: str):
-        self.id = id
-        self.name = name
-        self.device_type_id = type
+        super().__init__(id, name, type)
         self.state = state
         self.module_id = mod
 

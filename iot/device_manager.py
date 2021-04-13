@@ -15,14 +15,12 @@
 """
 
 
-from .logger import root_logger
-from .types.device import Device
-from typing import Dict
-from threading import Lock
+__all__ = ("DeviceManager", "DeviceState")
 
 
-
-logger = root_logger.getChild(__name__.split(".", 1)[-1])
+from .types import Device
+import typing
+import threading
 
 
 class DeviceState:
@@ -34,7 +32,7 @@ class DeviceManager:
 
     def __init__(self):
         self.__device_pool = dict()
-        self.__lock = Lock()
+        self.__lock = threading.Lock()
 
     def add(self, device: Device) -> None:
         if not isinstance(device, Device):
@@ -42,8 +40,6 @@ class DeviceManager:
         self.__lock.acquire()
         if device.id not in self.__device_pool:
             self.__device_pool[device.id] = device
-        else:
-            logger.warning("device '{}' already in pool".format(device.id))
         self.__lock.release()
 
     def delete(self, device_id: str) -> None:
@@ -53,7 +49,7 @@ class DeviceManager:
         try:
             del self.__device_pool[device_id]
         except KeyError:
-            logger.warning("device '{}' does not exist in device pool".format(device_id))
+            pass
         self.__lock.release()
 
     def get(self, device_id: str) -> Device:
@@ -63,7 +59,6 @@ class DeviceManager:
         try:
             device = self.__device_pool[device_id]
         except KeyError:
-            logger.error("device '{}' not in pool".format(device_id))
             self.__lock.release()
             raise
         self.__lock.release()
@@ -75,7 +70,7 @@ class DeviceManager:
         self.__lock.release()
 
     @property
-    def devices(self) -> Dict[str, Device]:
+    def devices(self) -> typing.Dict[str, Device]:
         self.__lock.acquire()
         devices = self.__device_pool.copy()
         self.__lock.release()

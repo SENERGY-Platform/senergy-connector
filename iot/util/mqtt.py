@@ -17,18 +17,17 @@
 __all__ = ("Client", )
 
 
-from iot.util.logger import root_logger, logging_levels
-from iot.util.config import config, EnvVars
+from . import conf, EnvVars, get_logger, logging_levels
 import paho.mqtt.client
 import logging
 import threading
 import time
 
 
-logger = root_logger.getChild(__name__.split(".", 1)[-1])
+logger = get_logger(__name__.split(".", 1)[-1])
 
 mqtt_logger = logging.getLogger("mqtt-client")
-mqtt_logger.setLevel(logging_levels.setdefault(config.Logger.mqtt_level, "info"))
+mqtt_logger.setLevel(logging_levels.setdefault(conf.Logger.mqtt_level, "info"))
 
 
 class Client(threading.Thread):
@@ -37,7 +36,7 @@ class Client(threading.Thread):
         self.__upstream_queue = upstream_queue
         self.__mqtt = paho.mqtt.client.Client(
             client_id=EnvVars.ModuleID.value,
-            clean_session=config.MQTTClient.clean_session
+            clean_session=conf.MQTTClient.clean_session
         )
         self.__mqtt.on_connect = self.__onConnect
         self.__mqtt.on_disconnect = self.__onDisconnect
@@ -47,27 +46,27 @@ class Client(threading.Thread):
     def run(self) -> None:
         while True:
             try:
-                self.__mqtt.connect(config.MB.host, config.MB.port, keepalive=config.MQTTClient.keep_alive)
+                self.__mqtt.connect(conf.MB.host, conf.MB.port, keepalive=conf.MQTTClient.keep_alive)
                 self.__mqtt.loop_forever()
             except Exception as ex:
                 logger.error(
-                    "could not connect to '{}' on '{}' - {}".format(config.MB.host, config.MB.port, ex)
+                    "could not connect to '{}' on '{}' - {}".format(conf.MB.host, conf.MB.port, ex)
                 )
             time.sleep(5)
 
     def __onConnect(self, client, userdata, flags, rc):
         if rc == 0:
-            logger.info("connected to '{}'".format(config.MB.host))
-            self.__mqtt.subscribe(config.MQTTClient.event_sub_topic)
-            self.__mqtt.subscribe(config.MQTTClient.command_response_sub_topic)
+            logger.info("connected to '{}'".format(conf.MB.host))
+            self.__mqtt.subscribe(conf.MQTTClient.event_sub_topic)
+            self.__mqtt.subscribe(conf.MQTTClient.command_response_sub_topic)
         else:
-            logger.error("could not connect to '{}' - {}".format(config.MB.host, paho.mqtt.client.connack_string(rc)))
+            logger.error("could not connect to '{}' - {}".format(conf.MB.host, paho.mqtt.client.connack_string(rc)))
 
     def __onDisconnect(self, client, userdata, rc):
         if rc == 0:
-            logger.info("disconnected from '{}'".format(config.MB.host))
+            logger.info("disconnected from '{}'".format(conf.MB.host))
         else:
-            logger.warning("disconnected from '{}' unexpectedly".format(config.MB.host))
+            logger.warning("disconnected from '{}' unexpectedly".format(conf.MB.host))
 
     def __onMessage(self, client, userdata, message: paho.mqtt.client.MQTTMessage):
         try:

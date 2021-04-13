@@ -15,15 +15,14 @@
 """
 
 
-from .configuration import config
-from .logger import root_logger
-from .device_manager import DeviceManager
+from iot.util import conf, get_logger
+from iot.device_manager import DeviceManager
 from .types.device import Device
 from threading import Thread
 import time, requests, cc_lib
 
 
-logger = root_logger.getChild(__name__.split(".", 1)[-1])
+logger = get_logger(__name__.split(".", 1)[-1])
 
 
 class Monitor(Thread):
@@ -42,7 +41,7 @@ class Monitor(Thread):
 
     def __queryDeviceManager(self):
         try:
-            response = requests.get("{}/{}".format(config.DM.url, config.DM.api))
+            response = requests.get("{}/{}".format(conf.DM.url, conf.DM.api))
             if response.status_code == 200:
                 return response.json()
             else:
