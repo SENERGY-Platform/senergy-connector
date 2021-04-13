@@ -66,7 +66,7 @@ class Monitor(Thread):
                 logger.info("can't find '{}' with id '{}'".format(
                     self.__device_manager.get(device_id).name, device_id)
                 )
-                futures.append((device_id, self.__client.disconnectDevice(device_id, asynchronous=True)))
+                futures.append((device_id, self.__client.disconnect_device(device_id, asynchronous=True)))
             for device_id, future in futures:
                 future.wait()
                 try:
@@ -85,14 +85,14 @@ class Monitor(Thread):
                     queried_devices[device_id]["module_id"]
                 )
                 logger.info("found '{}' with id '{}'".format(device.name, device.id))
-                futures.append((device, self.__client.addDevice(device, asynchronous=True)))
+                futures.append((device, self.__client.add_device(device, asynchronous=True)))
             for device, future in futures:
                 future.wait()
                 try:
                     future.result()
                     self.__device_manager.add(device)
                     if device.state == "online":
-                        self.__client.connectDevice(device, asynchronous=True)
+                        self.__client.connect_device(device, asynchronous=True)
                 except (cc_lib.client.DeviceAddError, cc_lib.client.DeviceUpdateError):
                     pass
         if changed_devices:
@@ -106,11 +106,11 @@ class Monitor(Thread):
                 # device.device_type_id = queried_devices[device_id]["device_type"]
                 if device.state != prev_state:
                     if device.state == "online":
-                        self.__client.connectDevice(device, asynchronous=True)
+                        self.__client.connect_device(device, asynchronous=True)
                     elif device.state == "offline":
-                        self.__client.disconnectDevice(device, asynchronous=True)
+                        self.__client.disconnect_device(device, asynchronous=True)
                 if device.name != prev_device_name:
-                    futures.append((device, prev_device_name, self.__client.updateDevice(device, asynchronous=True)))
+                    futures.append((device, prev_device_name, self.__client.update_device(device, asynchronous=True)))
             for device, prev_device_name, future in futures:
                 future.wait()
                 try:
@@ -120,6 +120,6 @@ class Monitor(Thread):
                     device.name = prev_device_name
         if any((missing_devices, new_devices, updated_devices)):
             try:
-                self.__client.syncHub(list(self.__device_manager.devices.values()), asynchronous=True)
+                self.__client.sync_hub(list(self.__device_manager.devices.values()), asynchronous=True)
             except cc_lib.client.HubError:
                 pass
