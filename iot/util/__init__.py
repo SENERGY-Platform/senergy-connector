@@ -38,3 +38,11 @@ def delay_start(min: int, max: int):
     delay = random.randint(min, max)
     print("delaying start for {}s".format(delay))
     time.sleep(delay)
+
+
+def load_hub_id():
+    try:
+        with open(hub_id_path, "r") as file:
+            return file.read()
+    except FileNotFoundError:
+        pass
