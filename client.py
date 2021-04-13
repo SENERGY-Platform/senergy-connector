@@ -23,6 +23,7 @@ import cc_lib
 import time
 import queue
 import signal
+import os
 
 
 device_manager = DeviceManager()
@@ -54,10 +55,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handle_sigterm)
     signal.signal(signal.SIGINT, handle_sigterm)
     init_logger(conf.Logger.level)
-    if conf.Hub.id:
-        hub_id = conf.Hub.id
-    else:
-        hub_id = load_hub_id()
+    hub_id = os.getenv("OVERRIDE_HUB_ID", load_hub_id())
     while True:
         try:
             if not hub_id:
