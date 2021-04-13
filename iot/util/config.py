@@ -58,7 +58,6 @@ class Conf:
     @simple_env_var.section
     class Hub:
         name = "my-multi-gateway"
-        id = None
 
 
 conf = Conf()
