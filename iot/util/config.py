@@ -52,7 +52,7 @@ class Conf:
     @simple_env_var.section
     class DSRouter:
         max_command_age = 60
-        cmd_prefix = "client-connector"
+        cmd_prefix = "cloud-command"
 
 
 conf = Conf()
