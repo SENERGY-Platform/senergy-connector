@@ -8,6 +8,6 @@ WORKDIR /usr/src/app
 
 COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN mkdir sc_data
+RUN mkdir .data
 
 CMD [ "python", "-u", "./client.py"]
