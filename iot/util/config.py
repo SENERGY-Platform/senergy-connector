@@ -30,7 +30,7 @@ class Conf:
 
     @simple_env_var.section
     class DM:
-        url = "http://device-management-service"
+        url = "http://device-manager"
         api = "devices"
 
     @simple_env_var.section
