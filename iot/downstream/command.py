@@ -43,7 +43,7 @@ class Router(threading.Thread):
                     self.__mqtt.publish(
                         "{}/{}/{}".format(conf.MQTTClient.command_pub_topic, cmd.device_id, cmd.service_uri),
                         json.dumps({"command_id": "{}{}".format(self.__cmd_prefix, cmd.correlation_id), "data": cmd.message.data}),
-                        qos=1
+                        qos=conf.MQTTClient.qos
                     )
                 else:
                     logger.warning("dropped command - max age exceeded - correlation id: {}".format(cmd.correlation_id))

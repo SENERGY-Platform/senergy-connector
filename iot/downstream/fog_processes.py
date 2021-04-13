@@ -39,7 +39,7 @@ class Router(threading.Thread):
                 self.__mqtt.publish(
                     "{}/{}".format(conf.MQTTClient.fog_processes_pub_topic, envelope.sub_topic),
                     envelope.message,
-                    qos=1
+                    qos=conf.MQTTClient.qos
                 )
         except Exception as ex:
             logger.error(ex)

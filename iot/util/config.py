@@ -48,6 +48,7 @@ class Conf:
         fog_processes_pub_topic = "processes/cmd"
         keep_alive = 5
         id = "senergy-connector"
+        qos = 1
 
     @simple_env_var.section
     class DSRouter:
