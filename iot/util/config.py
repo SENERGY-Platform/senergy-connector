@@ -14,7 +14,7 @@
    limitations under the License.
 """
 
-__all__ = ("conf", )
+__all__ = ("conf", "hub_id_path")
 
 
 import simple_env_var
@@ -57,3 +57,5 @@ class Conf:
 
 
 conf = Conf()
+
+hub_id_path = ".data/hub_id"
