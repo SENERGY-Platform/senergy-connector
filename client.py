@@ -14,7 +14,7 @@
    limitations under the License.
 """
 
-from iot.util import conf, init_logger, handle_sigterm, mqtt
+from iot.util import conf, init_logger, handle_sigterm, load_hub_id, save_hub_id, mqtt
 from iot.device_manager import DeviceManager
 from iot.monitor import Monitor
 from iot import upstream
@@ -54,9 +54,16 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handle_sigterm)
     signal.signal(signal.SIGINT, handle_sigterm)
     init_logger(conf.Logger.level)
+    if conf.Hub.id:
+        hub_id = conf.Hub.id
+    else:
+        hub_id = load_hub_id()
     while True:
         try:
-            connector_client.init_hub()
+            if not hub_id:
+                save_hub_id(connector_client.init_hub(hub_name=conf.Hub.name))
+            else:
+                connector_client.init_hub(hub_id=hub_id, hub_name=conf.Hub.name)
             break
         except cc_lib.client.HubInitializationError:
             time.sleep(10)
