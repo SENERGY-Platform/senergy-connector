@@ -46,3 +46,8 @@ def load_hub_id():
             return file.read()
     except FileNotFoundError:
         pass
+
+
+def save_hub_id(id: str):
+    with open(hub_id_path, "w") as file:
+        file.write(id)
