@@ -53,6 +53,7 @@ def init_logger(level):
         err = "unknown log level '{}'".format(level)
         raise LoggerError(err)
     logger.setLevel(logging_levels[level])
+    cc_lib_logger.setLevel(logging_levels[level])
 
 
 def get_logger(name: str) -> logging.Logger:
