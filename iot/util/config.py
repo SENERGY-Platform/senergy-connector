@@ -42,7 +42,7 @@ class Conf:
         clean_session = False
         event_sub_topic = "event/#"
         command_pub_topic = "command"
-        response_sub_topic = "response/#"
+        command_response_sub_topic = "response/#"
         fog_processes_sub_topic = "processes/state/#"
         fog_processes_pub_topic = "processes/cmd"
         keep_alive = 5

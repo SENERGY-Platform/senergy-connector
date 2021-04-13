@@ -17,8 +17,8 @@
 __all__ = ("Client", )
 
 
-from .logger import root_logger, logging_levels
-from .configuration import config, EnvVars
+from iot.util.logger import root_logger, logging_levels
+from iot.util.config import config, EnvVars
 import paho.mqtt.client
 import logging
 import threading
@@ -59,7 +59,7 @@ class Client(threading.Thread):
         if rc == 0:
             logger.info("connected to '{}'".format(config.MB.host))
             self.__mqtt.subscribe(config.MQTTClient.event_sub_topic)
-            self.__mqtt.subscribe(config.MQTTClient.response_sub_topic)
+            self.__mqtt.subscribe(config.MQTTClient.command_response_sub_topic)
         else:
             logger.error("could not connect to '{}' - {}".format(config.MB.host, paho.mqtt.client.connack_string(rc)))
 

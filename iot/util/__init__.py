@@ -1,5 +1,5 @@
 """
-   Copyright 2020 InfAI (CC SES)
+   Copyright 2021 InfAI (CC SES)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,18 +15,26 @@
 """
 
 
-from .configuration import config
-import logging, cc_lib
+from .config import *
+from .logger import *
+import iot.util.mqtt
+import sys
+import random
+import time
 
 
-logging_levels = {
-    'info': logging.INFO,
-    'warning': logging.WARNING,
-    'error': logging.ERROR,
-    'critical': logging.CRITICAL,
-    'debug': logging.DEBUG
-}
+__all__ = (
+    config.__all__,
+    logger.__all__
+)
 
 
-root_logger = cc_lib.logger.getLogger("iot")
-root_logger.setLevel(logging_levels.setdefault(config.Logger.level, logging.INFO))
+def handle_sigterm(signo, stack_frame):
+    print("\ngot signal '{}' - exiting ...\n".format(signo))
+    sys.exit(0)
+
+
+def delay_start(min: int, max: int):
+    delay = random.randint(min, max)
+    print("delaying start for {}s".format(delay))
+    time.sleep(delay)
