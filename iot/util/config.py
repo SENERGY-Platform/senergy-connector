@@ -55,6 +55,11 @@ class Conf:
         max_command_age = 60
         cmd_prefix = "cloud-command"
 
+    @simple_env_var.section
+    class Hub:
+        name = "my-multi-gateway"
+        id = None
+
 
 conf = Conf()
 
