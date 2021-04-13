@@ -45,7 +45,7 @@ class Conf:
         response_sub_topic = "response/#"
         fog_processes_sub_topic = "processes/state/#"
         fog_processes_pub_topic = "processes/cmd"
-        keep_alive = 10
+        keep_alive = 5
 
     @simple_env_var.section
     class DSRouter:
