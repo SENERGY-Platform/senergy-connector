@@ -14,11 +14,10 @@
    limitations under the License.
 """
 
-__all__ = ("conf", "EnvVars")
+__all__ = ("conf", )
 
 
 import simple_env_var
-import os
 
 
 @simple_env_var.configuration
@@ -48,6 +47,7 @@ class Conf:
         fog_processes_sub_topic = "processes/state/#"
         fog_processes_pub_topic = "processes/cmd"
         keep_alive = 5
+        id = "senergy-connector"
 
     @simple_env_var.section
     class DSRouter:
@@ -56,14 +56,3 @@ class Conf:
 
 
 conf = Conf()
-
-
-class EnvVars:
-
-    class GatewayLocalIP:
-        name = "GATEWAY_LOCAL_IP"
-        value = os.getenv("GATEWAY_LOCAL_IP")
-
-    class ModuleID:
-        name = "MODULE_ID"
-        value = os.getenv("MODULE_ID")

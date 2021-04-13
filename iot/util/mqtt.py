@@ -17,7 +17,7 @@
 __all__ = ("Client", )
 
 
-from . import conf, EnvVars, get_logger, logging_levels
+from . import conf, get_logger, logging_levels
 import paho.mqtt.client
 import logging
 import threading
@@ -35,7 +35,7 @@ class Client(threading.Thread):
         super().__init__(name="mqtt", daemon=True)
         self.__upstream_queue = upstream_queue
         self.__mqtt = paho.mqtt.client.Client(
-            client_id=EnvVars.ModuleID.value,
+            client_id=conf.MQTTClient.id,
             clean_session=conf.MQTTClient.clean_session
         )
         self.__mqtt.on_connect = self.__onConnect

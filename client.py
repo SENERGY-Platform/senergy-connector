@@ -14,7 +14,7 @@
    limitations under the License.
 """
 
-from iot.util import conf, EnvVars, init_logger, handle_sigterm, mqtt
+from iot.util import conf, init_logger, handle_sigterm, mqtt
 from iot.device_manager import DeviceManager
 from iot.monitor import Monitor
 from iot import upstream
@@ -43,7 +43,7 @@ upstream_queue = queue.Queue()
 
 mqtt_client = mqtt.Client(upstream_queue)
 
-cmd_prefix = "{}-{}-".format(EnvVars.ModuleID.value, conf.DSRouter.cmd_prefix)
+cmd_prefix = "{}-{}-".format(conf.MQTTClient.id, conf.DSRouter.cmd_prefix)
 
 upstream_router = upstream.Router(connector_client, upstream_queue, cmd_prefix)
 downstream_cmd_router = downstream.command.Router(connector_client, mqtt_client, cmd_prefix)
