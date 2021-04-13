@@ -40,7 +40,6 @@ class Conf:
     @simple_env_var.section
     class MQTTClient:
         clean_session = False
-        fog_topic = "fog/analytics/#"
         event_sub_topic = "event/#"
         command_pub_topic = "command"
         response_sub_topic = "response/#"
