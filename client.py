@@ -35,7 +35,7 @@ def on_connect(client: cc_lib.client.Client):
             client.connect_device(device.id)
 
 
-connector_client = cc_lib.client.Client()
+connector_client = cc_lib.client.Client(fog_processes=True)
 connector_client.set_connect_clbk(on_connect)
 
 monitor = Monitor(device_manager, connector_client)
