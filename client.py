@@ -61,9 +61,14 @@ if __name__ == '__main__':
             if not hub_id:
                 save_hub_id(connector_client.init_hub(hub_name=conf.Hub.name))
             else:
-                connector_client.init_hub(hub_id=hub_id, hub_name=conf.Hub.name)
+                try:
+                    connector_client.init_hub(hub_id=hub_id, hub_name=conf.Hub.name)
+                except cc_lib.client.HubNotFoundError as ex:
+                    if not os.getenv("OVERRIDE_HUB_ID"):
+                        hub_id = None
+                    raise ex
             break
-        except cc_lib.client.HubInitializationError:
+        except cc_lib.client.HubError:
             time.sleep(conf.Hub.init_delay)
     connector_client.connect(reconnect=True)
     monitor.start()
