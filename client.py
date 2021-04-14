@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 connector_client.init_hub(hub_id=hub_id, hub_name=conf.Hub.name)
             break
         except cc_lib.client.HubInitializationError:
-            time.sleep(10)
+            time.sleep(conf.Hub.init_delay)
     connector_client.connect(reconnect=True)
     monitor.start()
     upstream_router.start()

@@ -58,6 +58,7 @@ class Conf:
     @simple_env_var.section
     class Hub:
         name = "my-multi-gateway"
+        init_delay = 15
 
 
 conf = Conf()
