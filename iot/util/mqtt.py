@@ -59,6 +59,7 @@ class Client(threading.Thread):
             logger.info("connected to '{}'".format(conf.MB.host))
             self.__mqtt.subscribe(conf.MQTTClient.event_sub_topic)
             self.__mqtt.subscribe(conf.MQTTClient.command_response_sub_topic)
+            self.__mqtt.subscribe(conf.MQTTClient.fog_processes_sub_topic)
         else:
             logger.error("could not connect to '{}' - {}".format(conf.MB.host, paho.mqtt.client.connack_string(rc)))
 
