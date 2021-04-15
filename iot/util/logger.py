@@ -40,7 +40,7 @@ date_fmt = '%m.%d.%Y %I:%M:%S %p'
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(fmt=msg_fmt, datefmt=date_fmt))
 
-logger = logging.getLogger("smart-meter-dc")
+logger = logging.getLogger("senergy-connector")
 logger.propagate = False
 logger.addHandler(handler)
 
