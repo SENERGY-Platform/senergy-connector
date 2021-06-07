@@ -37,33 +37,30 @@ class Router(threading.Thread):
         self.__cmd_prefix = cmd_prefix
 
     def run(self) -> None:
-        try:
-            msg = cc_lib.types.message.DeviceMessage()
-            while True:
+        msg = cc_lib.types.message.DeviceMessage()
+        while True:
+            try:
                 topic, data = self.__upstream_queue.get()
-                try:
-                    if topic[0] == event_topic_root:
-                        msg.data = data.decode()
-                        self.__client.send_event(cc_lib.types.message.EventEnvelope(topic[1], topic[2], msg))
-                    elif topic[0] == cmd_resp_topic_root:
-                        data = json.loads(data)
-                        if self.__cmd_prefix in data["command_id"]:
-                            msg.data = data["data"]
-                            self.__client.send_command_response(
-                                cc_lib.types.message.CommandResponseEnvelope(
-                                    device=topic[1],
-                                    service=topic[2],
-                                    message=msg,
-                                    corr_id=data["command_id"].replace(self.__cmd_prefix, "")
-                                )
+                if topic[0] == event_topic_root:
+                    msg.data = data.decode()
+                    self.__client.send_event(cc_lib.types.message.EventEnvelope(topic[1], topic[2], msg))
+                elif topic[0] == cmd_resp_topic_root:
+                    data = json.loads(data)
+                    if self.__cmd_prefix in data["command_id"]:
+                        msg.data = data["data"]
+                        self.__client.send_command_response(
+                            cc_lib.types.message.CommandResponseEnvelope(
+                                device=topic[1],
+                                service=topic[2],
+                                message=msg,
+                                corr_id=data["command_id"].replace(self.__cmd_prefix, "")
                             )
-                            logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
-                    elif topic[0] == fog_prcs_topic_root:
-                        self.__client.send_fog_process_sync(
-                            cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic[2:]), message=data)
                         )
-                        logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
-                except Exception as ex:
-                    logger.error(ex)
-        except Exception as ex:
-            logger.error(ex)
+                        logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
+                elif topic[0] == fog_prcs_topic_root:
+                    self.__client.send_fog_process_sync(
+                        cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic[2:]), message=data)
+                    )
+                    logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
+            except Exception as ex:
+                logger.error(ex)
