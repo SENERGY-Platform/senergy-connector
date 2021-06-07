@@ -32,7 +32,12 @@ device_manager = DeviceManager()
 def on_connect(client: cc_lib.client.Client):
     for device in device_manager.devices.values():
         if device.state == "online":
-            client.connect_device(device.id)
+            try:
+                client.connect_device(device.id)
+            except cc_lib.client.DeviceConnectError:
+                pass
+            except cc_lib.client.NotConnectedError:
+                break
 
 
 connector_client = cc_lib.client.Client(fog_processes=True)
