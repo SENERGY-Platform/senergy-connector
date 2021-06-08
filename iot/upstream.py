@@ -63,4 +63,4 @@ class Router(threading.Thread):
                     )
                     logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
             except Exception as ex:
-                logger.error(ex)
+                logger.error("could not route message - {}".format(ex))
