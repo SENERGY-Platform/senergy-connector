@@ -62,5 +62,7 @@ class Router(threading.Thread):
                         cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic[2:]), message=data)
                     )
                     logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
+                else:
+                    raise RuntimeError("topic '{}' unknown".format("/".join(topic)))
             except Exception as ex:
                 logger.error("could not route message - {}".format(ex))
