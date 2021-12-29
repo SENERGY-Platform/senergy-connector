@@ -21,8 +21,8 @@ import cc_lib
 
 
 class Device(cc_lib.types.Device):
-    def __init__(self, id: str, name: str, type: str, state: str, mod: str):
-        super().__init__(id, name, type)
+    def __init__(self, id: str, name: str, type: str, state: str, mod: str, attributes):
+        super().__init__(id, name, type, attributes)
         self.state = state
         self.module_id = mod
 
@@ -31,7 +31,8 @@ class Device(cc_lib.types.Device):
             ("name", self.name),
             ("device_type", self.device_type_id),
             ("state", self.state),
-            ("module_id", self.module_id)
+            ("module_id", self.module_id),
+            ("attributes", self.attributes),
         )
         for item in items:
             yield item

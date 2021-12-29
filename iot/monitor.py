@@ -82,7 +82,8 @@ class Monitor(Thread):
                     queried_devices[device_id]["name"],
                     queried_devices[device_id]["device_type"],
                     queried_devices[device_id]["state"],
-                    queried_devices[device_id]["module_id"]
+                    queried_devices[device_id]["module_id"],
+                    queried_devices[device_id]["attributes"] if "attributes" in queried_devices[device_id] else [],
                 )
                 logger.info("found '{}' with id '{}'".format(device.name, device.id))
                 futures.append((device, self.__client.add_device(device, asynchronous=True)))
