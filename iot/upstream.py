@@ -27,6 +27,9 @@ logger = get_logger(__name__.split(".", 1)[-1])
 event_topic_root = conf.MQTTClient.event_sub_topic.split("/", 1)[0]
 cmd_resp_topic_root = conf.MQTTClient.command_response_sub_topic.split("/", 1)[0]
 fog_prcs_topic_root = conf.MQTTClient.fog_processes_sub_topic.split("/", 1)[0]
+client_error_topic_root = conf.MQTTClient.client_error_sub_topic
+device_error_topic_root = conf.MQTTClient.device_error_sub_topic.rsplit("/", 1)[0]
+command_error_topic_root = conf.MQTTClient.command_error_sub_topic.rsplit("/", 1)[0]
 
 
 class Router(threading.Thread):
@@ -62,6 +65,21 @@ class Router(threading.Thread):
                         cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic[2:]), message=data)
                     )
                     logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
+                elif topic[0] == client_error_topic_root:
+                    self.__client.send_client_error(
+                        cc_lib.types.message.ClientErrorEnvelope(message=data)
+                    )
+                elif topic[0] == device_error_topic_root:
+                    self.__client.send_device_error(
+                        cc_lib.types.message.DeviceErrorEnvelope(message=data, device=topic[1])
+                    )
+                elif topic[0] == command_error_topic_root:
+                    self.__client.send_command_error(
+                        cc_lib.types.message.CommandErrorEnvelope(
+                            message=data,
+                            corr_id=topic[1].replace(self.__cmd_prefix, "") if self.__cmd_prefix in topic[1] else topic[1]
+                        )
+                    )
                 else:
                     raise RuntimeError("topic '{}' unknown".format("/".join(topic)))
             except Exception as ex:
