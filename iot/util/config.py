@@ -46,6 +46,9 @@ class Conf:
         command_response_sub_topic = "response/#"
         fog_processes_sub_topic = "processes/state/#"
         fog_processes_pub_topic = "processes/cmd"
+        client_error_sub_topic = "error/client"
+        device_error_sub_topic = "error/device/+"
+        command_error_sub_topic = "error/command/+"
         keep_alive = 5
         id = "senergy-connector"
         qos = 1
