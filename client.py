@@ -60,7 +60,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handle_sigterm)
     signal.signal(signal.SIGINT, handle_sigterm)
     init_logger(conf.Logger.level)
-    hub_id = os.getenv("OVERRIDE_HUB_ID", load_hub_id())
+    hub_id = os.getenv("OVERRIDE_HUB_ID") or load_hub_id()
     while True:
         try:
             if not hub_id:
