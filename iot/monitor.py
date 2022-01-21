@@ -83,7 +83,7 @@ class Monitor(Thread):
                     queried_devices[device_id]["device_type"],
                     queried_devices[device_id]["state"],
                     queried_devices[device_id]["module_id"],
-                    queried_devices[device_id]["attributes"] if "attributes" in queried_devices[device_id] else [],
+                    queried_devices[device_id].get("attributes")
                 )
                 logger.info("found '{}' with id '{}'".format(device.name, device.id))
                 futures.append((device, self.__client.add_device(device, asynchronous=True)))
@@ -102,23 +102,25 @@ class Monitor(Thread):
                 device = self.__device_manager.get(device_id)
                 prev_device_name = device.name
                 prev_state = device.state
+                prev_attributes = device.attributes
                 device.name = queried_devices[device_id]["name"]
                 device.state = queried_devices[device_id]["state"]
-                # device.device_type_id = queried_devices[device_id]["device_type"]
+                device.attributes = queried_devices[device_id].get("attributes")
                 if device.state != prev_state:
                     if device.state == "online":
                         self.__client.connect_device(device, asynchronous=True)
                     elif device.state == "offline":
                         self.__client.disconnect_device(device, asynchronous=True)
-                if device.name != prev_device_name:
-                    futures.append((device, prev_device_name, self.__client.update_device(device, asynchronous=True)))
-            for device, prev_device_name, future in futures:
+                if device.name != prev_device_name or device.attributes != prev_attributes:
+                    futures.append((device, prev_device_name, prev_attributes, self.__client.update_device(device, asynchronous=True)))
+            for device, prev_device_name, prev_attributes, future in futures:
                 future.wait()
                 try:
                     future.result()
                     updated_devices.append(device.id)
                 except cc_lib.client.DeviceUpdateError:
                     device.name = prev_device_name
+                    device.attributes = prev_attributes
         if any((missing_devices, new_devices, updated_devices)):
             try:
                 self.__client.sync_hub(list(self.__device_manager.devices.values()), asynchronous=True)
