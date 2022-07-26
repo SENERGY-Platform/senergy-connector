@@ -72,13 +72,13 @@ class Router(threading.Thread):
                     )
                 elif match_topic(topic, device_error_topic_regex):
                     self.__client.send_device_error(
-                        cc_lib.types.message.DeviceErrorEnvelope(message=data, device=topic_parts[1])
+                        cc_lib.types.message.DeviceErrorEnvelope(message=data, device=topic_parts[2])
                     )
                 elif match_topic(topic, command_error_topic_regex):
                     self.__client.send_command_error(
                         cc_lib.types.message.CommandErrorEnvelope(
                             message=data,
-                            corr_id=topic_parts[1].replace(self.__cmd_prefix, "") if self.__cmd_prefix in topic_parts[1] else topic_parts[1]
+                            corr_id=topic_parts[2].replace(self.__cmd_prefix, "") if self.__cmd_prefix in topic_parts[2] else topic_parts[2]
                         )
                     )
                 else:
