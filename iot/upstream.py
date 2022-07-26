@@ -24,12 +24,12 @@ from .util import conf, get_logger, gen_regex, match_topic
 logger = get_logger(__name__.split(".", 1)[-1])
 
 
-event_topic_root = conf.MQTTClient.event_sub_topic.split("/", 1)[0]
-cmd_resp_topic_root = conf.MQTTClient.command_response_sub_topic.split("/", 1)[0]
-fog_prcs_topic_root = conf.MQTTClient.fog_processes_sub_topic.split("/", 1)[0]
-client_error_topic_root = conf.MQTTClient.client_error_sub_topic
-device_error_topic_root = conf.MQTTClient.device_error_sub_topic.rsplit("/", 1)[0]
-command_error_topic_root = conf.MQTTClient.command_error_sub_topic.rsplit("/", 1)[0]
+event_topic_regex = gen_regex(conf.MQTTClient.event_sub_topic)
+cmd_resp_topic_regex = gen_regex(conf.MQTTClient.command_response_sub_topic)
+fog_prcs_topic_regex = gen_regex(conf.MQTTClient.fog_processes_sub_topic)
+client_error_topic_regex = gen_regex(conf.MQTTClient.client_error_sub_topic)
+device_error_topic_regex = gen_regex(conf.MQTTClient.device_error_sub_topic)
+command_error_topic_regex = gen_regex(conf.MQTTClient.command_error_sub_topic)
 
 
 class Router(threading.Thread):
@@ -44,43 +44,44 @@ class Router(threading.Thread):
         while True:
             try:
                 topic, data = self.__upstream_queue.get()
-                if topic[0] == event_topic_root:
+                topic_parts = topic.split("/")
+                if match_topic(topic, event_topic_regex):
                     msg.data = data.decode()
-                    self.__client.send_event(cc_lib.types.message.EventEnvelope(topic[1], topic[2], msg))
-                elif topic[0] == cmd_resp_topic_root:
+                    self.__client.send_event(cc_lib.types.message.EventEnvelope(topic_parts[1], topic_parts[2], msg))
+                elif match_topic(topic, cmd_resp_topic_regex):
                     data = json.loads(data)
                     if self.__cmd_prefix in data["command_id"]:
                         msg.data = data["data"]
                         self.__client.send_command_response(
                             cc_lib.types.message.CommandResponseEnvelope(
-                                device=topic[1],
-                                service=topic[2],
+                                device=topic_parts[1],
+                                service=topic_parts[2],
                                 message=msg,
                                 corr_id=data["command_id"].replace(self.__cmd_prefix, "")
                             )
                         )
                         logger.debug("response to '{}' - '{}'".format(data["command_id"], msg))
-                elif topic[0] == fog_prcs_topic_root:
+                elif match_topic(topic, fog_prcs_topic_regex):
                     self.__client.send_fog_process_sync(
-                        cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic[2:]), message=data)
+                        cc_lib.types.message.FogProcessesEnvelope(sub_topic="/".join(topic_parts[2:]), message=data)
                     )
-                    logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic[2:]), data))
-                elif topic[0] == client_error_topic_root:
+                    logger.debug("fog processes snyc for '{}' - '{}'".format("/".join(topic_parts[2:]), data))
+                elif match_topic(topic, client_error_topic_regex):
                     self.__client.send_client_error(
                         cc_lib.types.message.ClientErrorEnvelope(message=data)
                     )
-                elif topic[0] == device_error_topic_root:
+                elif match_topic(topic, device_error_topic_regex):
                     self.__client.send_device_error(
-                        cc_lib.types.message.DeviceErrorEnvelope(message=data, device=topic[1])
+                        cc_lib.types.message.DeviceErrorEnvelope(message=data, device=topic_parts[1])
                     )
-                elif topic[0] == command_error_topic_root:
+                elif match_topic(topic, command_error_topic_regex):
                     self.__client.send_command_error(
                         cc_lib.types.message.CommandErrorEnvelope(
                             message=data,
-                            corr_id=topic[1].replace(self.__cmd_prefix, "") if self.__cmd_prefix in topic[1] else topic[1]
+                            corr_id=topic_parts[1].replace(self.__cmd_prefix, "") if self.__cmd_prefix in topic_parts[1] else topic_parts[1]
                         )
                     )
                 else:
-                    raise RuntimeError("topic '{}' unknown".format("/".join(topic)))
+                    raise RuntimeError("topic '{}' unknown".format(topic))
             except Exception as ex:
                 logger.error("could not route message - {}".format(ex))
