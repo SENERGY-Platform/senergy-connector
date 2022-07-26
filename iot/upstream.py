@@ -19,7 +19,7 @@ import threading
 
 import cc_lib
 
-from .util import conf, get_logger
+from .util import conf, get_logger, gen_regex, match_topic
 
 logger = get_logger(__name__.split(".", 1)[-1])
 
