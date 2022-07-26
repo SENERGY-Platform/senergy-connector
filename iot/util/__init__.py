@@ -21,6 +21,7 @@ import iot.util.mqtt
 import sys
 import random
 import time
+import re
 
 
 __all__ = (
@@ -51,3 +52,19 @@ def load_hub_id():
 def save_hub_id(id: str):
     with open(hub_id_path, "w") as file:
         file.write(id)
+
+
+def gen_regex(topic: str):
+    topic = topic.replace("/", "\/")
+    if topic.endswith("+"):
+        topic = topic.rstrip("+")
+        topic = topic + "[^\/]*"
+    topic = topic.replace("+", ".*")
+    topic = topic.replace("#", ".*")
+    return r"{}$".format(topic)
+
+
+def match_topic(topic: str, regex):
+    if re.fullmatch(regex, topic):
+        return True
+    return False
