@@ -74,7 +74,7 @@ class Client(threading.Thread):
 
     def __onMessage(self, client, userdata, message: paho.mqtt.client.MQTTMessage):
         try:
-            self.__upstream_queue.put_nowait((message.topic.split("/"), message.payload))
+            self.__upstream_queue.put_nowait((message.topic, message.payload))
         except Exception as ex:
             logger.error(ex)
 
