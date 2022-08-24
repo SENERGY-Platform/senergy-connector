@@ -43,14 +43,14 @@ def delay_start(min: int, max: int):
 
 def load_hub_id():
     try:
-        with open(hub_id_path, "r") as file:
+        with open(conf.Hub.id_path, "r") as file:
             return file.read()
     except FileNotFoundError:
         pass
 
 
 def save_hub_id(id: str):
-    with open(hub_id_path, "w") as file:
+    with open(conf.Hub.id_path, "w") as file:
         file.write(id)
 
 

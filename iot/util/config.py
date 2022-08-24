@@ -14,56 +14,60 @@
    limitations under the License.
 """
 
-__all__ = ("conf", "hub_id_path")
+__all__ = ("conf", )
 
 
-import simple_env_var
+import sevm
 
 
-@simple_env_var.configuration
-class Conf:
-
-    @simple_env_var.section
-    class MB:
-        host = "message-broker"
-        port = 1883
-
-    @simple_env_var.section
-    class DM:
-        url = "http://device-manager"
-        api = "devices"
-
-    @simple_env_var.section
-    class Logger:
-        level = "info"
-        mqtt_level = "info"
-
-    @simple_env_var.section
-    class MQTTClient:
-        clean_session = False
-        event_sub_topic = "event/#"
-        command_pub_topic = "command"
-        command_response_sub_topic = "response/#"
-        fog_processes_sub_topic = "processes/state/#"
-        fog_processes_pub_topic = "processes/cmd"
-        client_error_sub_topic = "error/client"
-        device_error_sub_topic = "error/device/+"
-        command_error_sub_topic = "error/command/+"
-        keep_alive = 5
-        id = "senergy-connector"
-        qos = 1
-
-    @simple_env_var.section
-    class DSRouter:
-        max_command_age = 60
-        cmd_prefix = "cloud-command"
-
-    @simple_env_var.section
-    class Hub:
-        name = "my-multi-gateway"
-        init_delay = 15
+class MessageBrokerConfig(sevm.Config):
+    host = "message-broker"
+    port = 1883
 
 
-conf = Conf()
+class DeviceManagerConfig(sevm.Config):
+    url = "http://device-manager"
+    api = "devices"
 
-hub_id_path = ".data/hub_id"
+
+class LoggerConfig(sevm.Config):
+    level = "info"
+    mqtt_level = "info"
+
+
+class MQTTClientConfig(sevm.Config):
+    clean_session = False
+    event_sub_topic = "event/#"
+    command_pub_topic = "command"
+    command_response_sub_topic = "response/#"
+    fog_processes_sub_topic = "processes/state/#"
+    fog_processes_pub_topic = "processes/cmd"
+    client_error_sub_topic = "error/client"
+    device_error_sub_topic = "error/device/+"
+    command_error_sub_topic = "error/command/+"
+    keep_alive = 5
+    id = "senergy-connector"
+    qos = 1
+
+
+class DownStreamRouterConfig(sevm.Config):
+    max_command_age = 60
+    cmd_prefix = "cloud-command"
+
+
+class HubConfig(sevm.Config):
+    name = "my-multi-gateway"
+    init_delay = 15
+    id_path = ".data/hub_id"
+
+
+class Conf(sevm.Config):
+    MB = MessageBrokerConfig
+    DM = DeviceManagerConfig
+    Logger = LoggerConfig
+    MQTTClient = MQTTClientConfig
+    DSRouter = DownStreamRouterConfig
+    Hub = HubConfig
+
+
+conf = Conf(prefix="CONF_")
