@@ -1,0 +1,204 @@
+modfileVersion: "v1"
+id: github.com/SENERGY-Platform/senergy-connector/mgw-module
+name: SENERGY Connector
+description: Connect the gateway to the SENERGY Cloud.
+license: Apache-2.0 license
+author: InfAI (CC SES)
+version: v0.0.1
+type: add-on
+deploymentType: single
+dependencies:
+  github.com/SENERGY-Platform/mgw-mqtt-broker:
+    version: "<v2.0.0"
+    requiredServices:
+      broker:
+        - refVar: CONF_MB_HOST
+          services:
+            - connector
+  github.com/SENERGY-Platform/device-management-service/mgw-module:
+    version: "<v1.0.0"
+    requiredServices:
+      manager:
+        - refVar: CONF_DM_HOST
+          services:
+            - connector
+services:
+  connector:
+    name: SENERGY Connector
+    image: ghcr.io/senergy-platform/mgw-senergy-connector:0.0.1
+secrets:
+  cloud-credentials:
+    type: basic-auth
+    targets:
+      - refVar: CC_LIB_CREDENTIALS_USER
+        item: username
+        services:
+          - connector
+      - refVar: CC_LIB_CREDENTIALS_PW
+        item: password
+        services:
+          - connector
+    userInput:
+      name: Cloud user credentials
+  client-id:
+    type: api-key
+    targets:
+      - refVar: CC_LIB_CREDENTIALS_CLIENT_ID
+        services:
+          - connector
+    userInput:
+      name: Connector client ID
+configs:
+  broker-port:
+    dataType: int
+    value: 1883
+    targets:
+      - refVar: CONF_MB_PORT
+        services:
+          - connector
+  cloud-tls:
+    value: "True"
+    targets:
+      - refVar: CC_LIB_CONNECTOR_TLS
+        services:
+          - connector
+  device-attriibute-origin:
+    value: local-mgw
+    targets:
+      - refVar: CC_LIB_DEVICE_ATTRIBUTE_ORIGIN
+        services:
+          - connector
+  mqtt-qos:
+    dataType: int
+    value: 1
+    options:
+      - 0
+      - 1
+      - 2
+    targets:
+      - refVar: CONF_MQTTCLIENT_QOS
+        services:
+          - connector
+    userInput:
+      type: number
+      name: MQTT QoS
+  hub-name:
+    targets:
+      - refVar: CONF_HUB_NAME
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Hub name
+    optional: true
+  hub-id:
+    targets:
+      - refVar: OVERRIDE_HUB_ID
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Hub ID
+    optional: true
+  cloud-host:
+    value: connector.senergy.infai.org
+    targets:
+      - refVar: CC_LIB_CONNECTOR_HOST
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Cloud connector host
+  cloud-port:
+    dataType: int
+    value: 28883
+    targets:
+      - refVar: CC_LIB_CONNECTOR_PORT
+        services:
+          - connector
+    userInput:
+      type: number
+      name: Cloud port
+  cloud-mqtt-qos:
+    dataType: int
+    value: 1
+    options:
+      - 0
+      - 1
+      - 2
+    targets:
+      - refVar: CC_LIB_CONNECTOR_QOS
+        services:
+          - connector
+    userInput:
+      type: number
+      name: Cloud MQTT QoS
+  cloud-hub-api:
+    value: https://api.senergy.infai.org/device-manager/hubs
+    targets:
+      - refVar: CC_LIB_API_HUB_ENDPT
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Cloud hub API
+  cloud-device-api:
+    value: https://api.senergy.infai.org/device-manager/local-devices
+    targets:
+      - refVar: CC_LIB_API_DEVICE_ENDPT
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Cloud devices API
+  cloud-auth-api:
+    value: https://auth.senergy.infai.org/auth/realms/master/protocol/openid-connect/token
+    targets:
+      - refVar: CC_LIB_API_AUTH_ENDPT
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Cloud auth API
+  mqtt-log:
+    value: "False"
+    options:
+      - "True"
+      - "False"
+    targets:
+      - refVar: CC_LIB_CONNECTOR_LOW_LEVEL_LOGGER
+        services:
+          - connector
+    userInput:
+      type: text
+      name: MQTT log
+  log-level:
+    value: warning
+    options:
+      - info
+      - warning
+      - error
+      - critical
+      - debug
+    targets:
+      - refVar: CONF_LOGGER_LEVEL
+        services:
+          - connector
+    userInput:
+      type: text
+      name: Log level
+  mqtt-log-level:
+    value: warning
+    options:
+      - info
+      - warning
+      - error
+      - critical
+      - debug
+    targets:
+      - refVar: CONF_LOGGER_MQTT_LEVEL
+        services:
+          - connector
+    userInput:
+      type: text
+      name: MQTT log level
