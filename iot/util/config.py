@@ -26,7 +26,7 @@ class MessageBrokerConfig(sevm.Config):
 
 
 class DeviceManagerConfig(sevm.Config):
-    url = "http://device-manager"
+    host = "device-manager"
     api = "devices"
 
 

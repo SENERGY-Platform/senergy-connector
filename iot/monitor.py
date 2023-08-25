@@ -41,7 +41,7 @@ class Monitor(Thread):
 
     def __queryDeviceManager(self):
         try:
-            response = requests.get("{}/{}".format(conf.DM.url, conf.DM.api))
+            response = requests.get("http://{}/{}".format(conf.DM.host, conf.DM.api))
             if response.status_code == 200:
                 return response.json()
             else:
