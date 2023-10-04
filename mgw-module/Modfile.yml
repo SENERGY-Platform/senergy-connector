@@ -46,7 +46,7 @@ secrets:
     userInput:
       name: Cloud user credentials
   client-id:
-    type: api-key
+    type: client-id
     targets:
       - refVar: CC_LIB_CREDENTIALS_CLIENT_ID
         services:
