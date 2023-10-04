@@ -4,7 +4,7 @@ name: SENERGY Connector
 description: Connect the gateway to the SENERGY Cloud.
 license: Apache-2.0 license
 author: InfAI (CC SES)
-version: v0.0.2
+version: v0.0.3
 type: add-on
 deploymentType: single
 dependencies:
