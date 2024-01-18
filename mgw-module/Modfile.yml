@@ -56,7 +56,7 @@ secrets:
 configs:
   broker-port:
     dataType: int
-    value: 1883
+    value: 1881
     targets:
       - refVar: CONF_MB_PORT
         services:
