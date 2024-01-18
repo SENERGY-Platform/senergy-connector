@@ -9,7 +9,7 @@ type: add-on
 deploymentType: single
 dependencies:
   github.com/SENERGY-Platform/mgw-mqtt-broker:
-    version: "<v2.0.0"
+    version: ">=v2.0.0;<v3.0.0"
     requiredServices:
       broker:
         - refVar: CONF_MB_HOST
