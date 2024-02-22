@@ -25,11 +25,10 @@ import queue
 import signal
 import os
 
-
 device_manager = DeviceManager()
 
 
-def on_connect(client: cc_lib.client.Client, userdata, flags, reason_code, properties):
+def on_connect(client: cc_lib.client.Client = None, userdata=None, flags=None, reason_code=None, properties=None):
     for device in device_manager.devices.values():
         if device.state == "online":
             try:
@@ -54,7 +53,6 @@ cmd_prefix = "{}-{}-".format(conf.MQTTClient.id, conf.DSRouter.cmd_prefix)
 upstream_router = upstream.Router(connector_client, upstream_queue, cmd_prefix)
 downstream_cmd_router = downstream.command.Router(connector_client, mqtt_client, cmd_prefix)
 downstream_fog_prcs_router = downstream.fog_processes.Router(connector_client, mqtt_client)
-
 
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, handle_sigterm)
@@ -82,4 +80,3 @@ if __name__ == '__main__':
     downstream_fog_prcs_router.start()
     mqtt_client.start()
     monitor.join()
-
