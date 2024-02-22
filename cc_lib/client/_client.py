@@ -461,7 +461,7 @@ class Client:
         #     )
         #     worker.start()
         if self.__connect_clbk:
-            clbk_thread = threading.Thread(target=self.__connect_clbk, args=(self, ), name="user-connect-callback", daemon=True)
+            clbk_thread = threading.Thread(target=self.__connect_clbk, args=(self,), name="user-connect-callback", daemon=True)
             clbk_thread.start()
 
     def __on_disconnect(self, code: int, reason: str) -> None:

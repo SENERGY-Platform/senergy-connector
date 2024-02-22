@@ -14,15 +14,13 @@
    limitations under the License.
 """
 
-__all__ = ("Client", )
-
+__all__ = ("Client",)
 
 from . import conf, get_logger, logging_levels
 import paho.mqtt.client as mqtt
 import logging
 import threading
 import time
-
 
 logger = get_logger(__name__.split(".", 1)[-1])
 
@@ -55,7 +53,7 @@ class Client(threading.Thread):
                 )
             time.sleep(5)
 
-    def __onConnect(self, client, userdata, flags, reason_code, properties):
+    def __onConnect(self, client=None, userdata=None, flags=None, reason_code=None, properties=None):
         if reason_code == 0:
             logger.info("connected to '{}'".format(conf.MB.host))
             self.__mqtt.subscribe(conf.MQTTClient.event_sub_topic)
@@ -67,13 +65,13 @@ class Client(threading.Thread):
         else:
             logger.error("could not connect to '{}' - {}".format(conf.MB.host, mqtt.connack_string(reason_code)))
 
-    def __onDisconnect(self, client, userdata, flags, reason_code, properties):
+    def __onDisconnect(self, client=None, userdata=None, flags=None, reason_code=None, properties=None):
         if reason_code == 0:
             logger.warning("disconnected from '{}'".format(conf.MB.host))
         else:
-            logger.warning("disconnected from '{}' unexpectedly: '{'".format(conf.MB.host. reason_code))
+            logger.warning("disconnected from '{}' unexpectedly: '{'".format(conf.MB.host.reason_code))
 
-    def __onMessage(self, client, userdata, message: mqtt.MQTTMessage):
+    def __onMessage(self, client=None, userdata=None, message: mqtt.MQTTMessage = None):
         try:
             self.__upstream_queue.put_nowait((message.topic, message.payload))
         except Exception as ex:

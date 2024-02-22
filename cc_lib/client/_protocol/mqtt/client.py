@@ -163,7 +163,7 @@ class Client:
         except Exception as ex:
             self.__set_event("connect_event", ConnectError(ex))
 
-    def __connect_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, flags: dict, reason_code, properties) -> None:
+    def __connect_clbk(self, client: paho.mqtt.client.Client = None, userdata: typing.Any = None, flags: dict = None, reason_code = None, properties = None) -> None:
         if reason_code == 0:
             logger.info("connected")
             self.__set_event("connect_event")
@@ -176,13 +176,13 @@ class Client:
             except KeyError:
                 pass
 
-    def __message_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, message) -> None:
+    def __message_clbk(self, client: paho.mqtt.client.Client = None, userdata: typing.Any = None, message = None) -> None:
         self.on_message(message.payload, message.topic)
 
-    def __publish_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, reason_codes, properties) -> None:
+    def __publish_clbk(self, client: paho.mqtt.client.Client = None, userdata: typing.Any = None, mid: int = None, reason_codes = None, properties = None) -> None:
         self.__set_event(mid)
 
-    def __subscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, reason_codes, properties) -> None:
+    def __subscribe_clbk(self, client: paho.mqtt.client.Client = None, userdata: typing.Any = None, mid: int = None, reason_codes = None, properties = None) -> None:
         for sub_result in reason_codes:
             if sub_result == 1:
                 self.__set_event(mid)
@@ -191,7 +191,7 @@ class Client:
                 self.__set_event(mid, SubscribeNotAllowedError("subscribe request not allowed"))
 
 
-    def __unsubscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, properties, reason_codes) -> None:
+    def __unsubscribe_clbk(self, client: paho.mqtt.client.Client = None, userdata: typing.Any = None, mid: int = None, properties = None, reason_codes = None) -> None:
         self.__set_event(mid)
 
     def connect(self, host: str, port: int, usr: str, pw: str, event_worker) -> None:
