@@ -29,7 +29,7 @@ import os
 device_manager = DeviceManager()
 
 
-def on_connect(client: cc_lib.client.Client):
+def on_connect(client: cc_lib.client.Client, userdata, flags, reason_code, properties):
     for device in device_manager.devices.values():
         if device.state == "online":
             try:

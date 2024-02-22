@@ -568,6 +568,8 @@ class Client:
             )
             future = worker.start()
             future.wait()
+            if worker.exception:
+                raise worker.exception
 
     def __connect_device_on_done(self, event_worker):
         if event_worker.exception:

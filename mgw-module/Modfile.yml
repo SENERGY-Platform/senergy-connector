@@ -4,7 +4,7 @@ name: SENERGY Connector
 description: Connect the gateway to the SENERGY Cloud.
 license: Apache-2.0 license
 author: InfAI (CC SES)
-version: v0.0.4
+version: v0.0.5
 type: add-on
 deploymentType: single
 dependencies:
@@ -25,7 +25,7 @@ dependencies:
 services:
   connector:
     name: SENERGY Connector
-    image: ghcr.io/senergy-platform/mgw-senergy-connector:0.0.1
+    image: ghcr.io/senergy-platform/mgw-senergy-connector:0.0.5
 volumes:
   data:
     - mountPoint: /usr/src/app/.data

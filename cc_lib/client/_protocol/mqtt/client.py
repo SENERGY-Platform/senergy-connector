@@ -81,7 +81,7 @@ class Client:
         self.__events = dict()
         self.__loop_thread = None
         self.__usr_disconn = False
-        self.__mqtt = paho.mqtt.client.Client(client_id=client_id, clean_session=clean_session)
+        self.__mqtt = paho.mqtt.client.Client(callback_api_version=paho.mqtt.client.CallbackAPIVersion.VERSION2, client_id=client_id, clean_session=clean_session)
         self.__setup_mqtt()
         self.on_connect = None
         self.on_disconnect = None
@@ -92,7 +92,6 @@ class Client:
             self.__mqtt.enable_logger(mqtt_logger)
         if self.__tls:
             self.__mqtt.tls_set(tls_version=ssl.PROTOCOL_TLSv1_2)
-        self.__mqtt.message_retry_set(self.__msg_retry)
         self.__mqtt.on_message = self.__message_clbk
         self.__mqtt.on_publish = self.__publish_clbk
         self.__mqtt.on_subscribe = self.__subscribe_clbk
@@ -164,30 +163,35 @@ class Client:
         except Exception as ex:
             self.__set_event("connect_event", ConnectError(ex))
 
-    def __connect_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, flags: dict, rc: int) -> None:
-        if rc > 0:
-            try:
-                event = self.__events["connect_event"]
-                event.exception = ConnectError(paho.mqtt.client.connack_string(rc).replace(".", "").lower())
-            except KeyError:
-                pass
-        else:
+    def __connect_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, flags: dict, reason_code, properties) -> None:
+        if reason_code == 0:
+            logger.info("connected")
             self.__set_event("connect_event")
             self.on_connect()
+        if reason_code > 0:
+            logger.info("not connected")
+            try:
+                event = self.__events["connect_event"]
+                event.exception = ConnectError(paho.mqtt.client.connack_string(reason_code).replace(".", "").lower())
+            except KeyError:
+                pass
 
     def __message_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, message) -> None:
         self.on_message(message.payload, message.topic)
 
-    def __publish_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int) -> None:
+    def __publish_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, reason_codes, properties) -> None:
         self.__set_event(mid)
 
-    def __subscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, granted_qos: int) -> None:
-        if 128 in granted_qos:
-            self.__set_event(mid, SubscribeNotAllowedError("subscribe request not allowed"))
-        else:
-            self.__set_event(mid)
+    def __subscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, reason_codes, properties) -> None:
+        for sub_result in reason_codes:
+            if sub_result == 1:
+                self.__set_event(mid)
+            # Any reason code >= 128 is a failure.
+            if sub_result >= 128:
+                self.__set_event(mid, SubscribeNotAllowedError("subscribe request not allowed"))
 
-    def __unsubscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int) -> None:
+
+    def __unsubscribe_clbk(self, client: paho.mqtt.client.Client, userdata: typing.Any, mid: int, properties, reason_codes) -> None:
         self.__set_event(mid)
 
     def connect(self, host: str, port: int, usr: str, pw: str, event_worker) -> None:
@@ -197,7 +201,8 @@ class Client:
         self.__loop_thread.start()
 
     def reset(self, client_id: str):
-        self.__mqtt.reinitialise(client_id=client_id, clean_session=True)
+        self.__mqtt.disconnect()
+        self.__mqtt = paho.mqtt.client.Client(callback_api_version=paho.mqtt.client.CallbackAPIVersion.VERSION2, client_id=client_id, clean_session=True)
         self.__setup_mqtt()
 
     def disconnect(self) -> None:

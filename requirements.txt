@@ -1,3 +1,3 @@
 requests<3.0.0
 git+https://github.com/y-du/simple-env-var-manager.git@2.3.0
-git+https://github.com/SENERGY-Platform/client-connector-lib.git@master
+paho-mqtt==2.0.0

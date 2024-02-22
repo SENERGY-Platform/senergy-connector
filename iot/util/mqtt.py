@@ -35,6 +35,7 @@ class Client(threading.Thread):
         super().__init__(name="mqtt", daemon=True)
         self.__upstream_queue = upstream_queue
         self.__mqtt = mqtt.Client(
+            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
             client_id=conf.MQTTClient.id,
             clean_session=conf.MQTTClient.clean_session
         )
@@ -54,8 +55,8 @@ class Client(threading.Thread):
                 )
             time.sleep(5)
 
-    def __onConnect(self, client, userdata, flags, rc):
-        if rc == 0:
+    def __onConnect(self, client, userdata, flags, reason_code, properties):
+        if reason_code == 0:
             logger.info("connected to '{}'".format(conf.MB.host))
             self.__mqtt.subscribe(conf.MQTTClient.event_sub_topic)
             self.__mqtt.subscribe(conf.MQTTClient.command_response_sub_topic)
@@ -66,11 +67,11 @@ class Client(threading.Thread):
         else:
             logger.error("could not connect to '{}' - {}".format(conf.MB.host, mqtt.connack_string(reason_code)))
 
-    def __onDisconnect(self, userdata, rc):
-        if rc == 0:
+    def __onDisconnect(self, client, userdata, flags, reason_code, properties):
+        if reason_code == 0:
             logger.warning("disconnected from '{}'".format(conf.MB.host))
         else:
-            logger.warning("disconnected from '{}' unexpectedly: '{'".format(conf.MB.host. rc))
+            logger.warning("disconnected from '{}' unexpectedly: '{'".format(conf.MB.host. reason_code))
 
     def __onMessage(self, client, userdata, message: mqtt.MQTTMessage):
         try:
